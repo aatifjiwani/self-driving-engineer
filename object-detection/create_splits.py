@@ -18,6 +18,26 @@ def split(source, destination):
         - destination [str]: destination data directory, contains 3 sub folders: train / val / test
     """
     # TODO: Implement function
+    files = os.listdir(source)
+    random.shuffle(files)
+
+    import shutil
+    from pathlib import Path
+    Path(f"{destination}/train").mkdir(exist_ok=True, parents=True)
+    Path(f"{destination}/test").mkdir(exist_ok=True, parents=True)
+    Path(f"{destination}/val").mkdir(exist_ok=True, parents=True)
+
+    train_len = int(len(files)*0.7)
+    val_len = int(len(files)*0.2)
+
+    copy = lambda f, d: shutil.copy(f"{source}/{f}", f"{d}/{f}")
+    for i, f in enumerate(files):
+        if i < train_len:
+            copy(f, f"{destination}/train")
+        elif i < train_len + val_len:
+            copy(f, f"{destination}/val")
+        else:
+            copy(f, f"{destination}/test")
 
 
 if __name__ == "__main__":
