@@ -40,6 +40,9 @@ Most of the objects are cars, only some are pedestrians, and almost no cyclists.
 
 Another point to note about the data is the class distribution. The most obvious information is that the distribution of saturated red colors is extremely high as compared to blue and green. This must be due to the significant amount of brake and traffic lights in the scenes. 
 
+#### Cross-Validation Strategy
+I split the dataset into 70% training, 20% valiation, and 10% test. I did not use k-fold cross-validation due to the time constraints. 
+
 ## Experiments
 
 ### Reference Model (SSD)
