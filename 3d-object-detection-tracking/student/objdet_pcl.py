@@ -134,13 +134,19 @@ def bev_from_pcl(lidar_pcl, configs):
     print("student task ID_S2_EX1")
 
     ## step 1 :  compute bev-map discretization by dividing x-range by the bev-image height (see configs)
+    bev_cell_width = (np.subtract(*configs.lim_x[::-1])) / configs.bev_width
 
     ## step 2 : create a copy of the lidar pcl and transform all metrix x-coordinates into bev-image coordinates    
+    pcl = np.copy(lidar_pcl)
+    pcl[:, 0] = np.int_(np.floor(pcl[:, 0] / bev_cell_width))
 
     # step 3 : perform the same operation as in step 2 for the y-coordinates but make sure that no negative bev-coordinates occur
+    pcl[:, 1] = np.int_(np.floor(pcl[:, 1] / bev_cell_width) + (configs.bev_width + 1) / 2)
 
     # step 4 : visualize point-cloud using the function show_pcl from a previous task
-    
+    # show_pcl(pcl)
+    pcl[pcl[:, 3] < 0, 3] = 0.0
+    pcl[pcl[:, 3] > 1.0, 3] = 1.0
     #######
     ####### ID_S2_EX1 END #######     
     
@@ -151,18 +157,34 @@ def bev_from_pcl(lidar_pcl, configs):
     print("student task ID_S2_EX2")
 
     ## step 1 : create a numpy array filled with zeros which has the same dimensions as the BEV map
+    bev = np.zeros((configs.bev_height, configs.bev_width, 3))
 
     # step 2 : re-arrange elements in lidar_pcl_cpy by sorting first by x, then y, then -z (use numpy.lexsort)
+    pcl_sorted_z = lidar_pcl_cpy = pcl[np.lexsort((-pcl[:, 2], pcl[:, 1], pcl[:, 0]))]
 
     ## step 3 : extract all points with identical x and y such that only the top-most z-coordinate is kept (use numpy.unique)
     ##          also, store the number of points per x,y-cell in a variable named "counts" for use in the next task
+    _, unique_xy, counts = np.unique(pcl_sorted_z[:, :2], axis=0, return_index=True, return_counts=True)
+    pcl_unique_xy = pcl_sorted_z[unique_xy]
+    lidar_pcl_top = pcl_unique_xy
 
     ## step 4 : assign the intensity value of each unique entry in lidar_top_pcl to the intensity map 
     ##          make sure that the intensity is scaled in such a way that objects of interest (e.g. vehicles) are clearly visible    
     ##          also, make sure that the influence of outliers is mitigated by normalizing intensity on the difference between the max. and min. value within the point cloud
-
+    pcl_unique_int = pcl_unique_xy[:, 3]
+    pcl_unique_int = pcl_unique_int / np.subtract(*np.percentile(pcl_unique_int, [1, 99])[::-1])
+    
+    bev[np.int_(pcl_unique_xy[:, 0]), np.int_(pcl_unique_xy[:, 1]), 1] = pcl_unique_int
+    intensity_map = bev[:, :, 1]
+    
     ## step 5 : temporarily visualize the intensity map using OpenCV to make sure that vehicles separate well from the background
-
+    # img_intensity = intensity_map * 256
+    # img_intensity = img_intensity.astype(np.uint8)
+    # while (1):
+    #     cv2.imshow('img_intensity', img_intensity)
+    #     if cv2.waitKey(10) & 0xFF == 27:
+    #         break
+    # cv2.destroyAllWindows()
     #######
     ####### ID_S2_EX2 END ####### 
 
@@ -173,21 +195,24 @@ def bev_from_pcl(lidar_pcl, configs):
     print("student task ID_S2_EX3")
 
     ## step 1 : create a numpy array filled with zeros which has the same dimensions as the BEV map
+    # `bev` variable above
 
     ## step 2 : assign the height value of each unique entry in lidar_top_pcl to the height map 
     ##          make sure that each entry is normalized on the difference between the upper and lower height defined in the config file
     ##          use the lidar_pcl_top data structure from the previous task to access the pixels of the height_map
+    bev[np.int_(pcl_unique_xy[:, 0]), np.int_(pcl_unique_xy[:, 1]), 0] = pcl_unique_xy[:, 2]  / np.abs(configs.lim_z[1] - configs.lim_z[0])
+    height_map = bev[:, :, 0]
 
     ## step 3 : temporarily visualize the intensity map using OpenCV to make sure that vehicles separate well from the background
-
+    # img_height = height_map * 256
+    # img_height = img_height.astype(np.uint8)
+    # while (1):
+    #     cv2.imshow('img_height', img_height)
+    #     if cv2.waitKey(10) & 0xFF == 27:
+    #         break
+    # cv2.destroyAllWindows()
     #######
     ####### ID_S2_EX3 END #######       
-
-    # TODO remove after implementing all of the above steps
-    lidar_pcl_cpy = []
-    lidar_pcl_top = []
-    height_map = []
-    intensity_map = []
 
     # Compute density layer of the BEV map
     density_map = np.zeros((configs.bev_height + 1, configs.bev_width + 1))

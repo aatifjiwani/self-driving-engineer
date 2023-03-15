@@ -8,7 +8,7 @@
             "name": "basic_loop",
             "type": "python",
             "request": "launch",
-            "program": "sensor-fusion-exercise/basic_loop.py",
+            "program": "3d-object-detection-tracking/loop_over_dataset.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }
