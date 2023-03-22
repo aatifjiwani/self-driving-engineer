@@ -110,6 +110,7 @@ def show_range_image(frame, lidar_name):
     percentiles = np.percentile(ri_intensity, [1, 99])
     ri_intensity = ri_intensity * 255 / np.subtract(*percentiles[::-1])
     img_intensity = ri_intensity.astype(np.uint8)
+    img_intensity = img_intensity[:,ri_center-deg45:ri_center+deg45]
 
     # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
     img_range_intensity = np.vstack([img_range, img_intensity]).astype(np.uint8)
