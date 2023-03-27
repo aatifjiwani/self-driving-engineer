@@ -164,7 +164,7 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
             label_list.append(label)
     ax.legend(handle_list, label_list, loc='center left', shadow=True, fontsize='x-large', bbox_to_anchor=(0.8, 0.5))
 
-    plt.pause(0.01)
+    plt.pause(1)
     
     return fig, ax, ax2
 

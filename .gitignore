@@ -1,5 +1,7 @@
 y/
 sensor-fusion-exercise/
+cpp/
+pcl/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

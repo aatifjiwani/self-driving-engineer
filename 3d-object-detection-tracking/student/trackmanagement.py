@@ -174,7 +174,7 @@ class Trackmanagement:
         track.score = min(1., track.score + 1./params.window)
         if track.score >= params.confirmed_threshold:
             track.state = 'confirmed'
-        elif track.score >= 0.2:
+        else:
             track.state = 'tentative'
         ############
         # END student code
